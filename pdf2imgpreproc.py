@@ -129,12 +129,14 @@ ini_dpi = read_ini.get('dpi')
 ini_quality = read_ini.get('quality')
 ini_draw_rec_thick = read_ini.get('draw_rec_thick')
 ini_draw_line_thick = read_ini.get('draw_line_thick')
+ini_draw_hline_thick = read_ini.get('draw_hline_thick')
 
 # 以下はオペに影響するので指定がないときはエラーとする
 ini_extract_1table_on = read_ini.get('extract_1table_on')
 ini_mod_degree_on = read_ini.get('mod_degree_on')
 ini_draw_rec_on = read_ini.get('draw_rec_on')
 ini_draw_recandlines_on = read_ini.get('draw_recandlines_on')
+ini_draw_also_hlines_on = read_ini.get('draw_also_hlines_on')
 if ini_extract_1table_on is None:
     print("extract_1table_onは必須パラメータです(config_pdf2imagpreproc.ini)。")
     sys.exit(1)
@@ -147,6 +149,9 @@ if ini_draw_rec_on is None:
 if ini_draw_recandlines_on is None:
     print("draw_recandlines_onは必須パラメータです(config_pdf2imagpreproc.ini)。")
     sys.exit(1)
+if ini_draw_also_hlines_on is None:
+    print("draw_also_hlines_onはalsoなのに必須パラメータです(config_pdf2imagpreproc.ini)。")
+    sys.exit(1)
 
 # sharpness_on = read_ini.get('sharpness_on')
 
@@ -154,11 +159,13 @@ convdpi = int(ini_dpi) if ini_dpi is not None else 400
 convquality = int(ini_quality) if ini_quality is not None else 90
 draw_rec_thick = int(ini_draw_rec_thick) if ini_draw_rec_thick is not None else 10
 draw_line_thick = int(ini_draw_line_thick) if ini_draw_line_thick is not None else 2
+draw_hline_thick = int(ini_draw_hline_thick) if ini_draw_hline_thick is not None else 2
 
 extract_1table_on = int(ini_extract_1table_on)
 mod_degree_on = int(ini_mod_degree_on)
 draw_rec_on = int(ini_draw_rec_on)
 draw_recandlines_on = int(ini_draw_recandlines_on)
+draw_also_hlines_on = int(ini_draw_also_hlines_on)
 
 # iniファイルでの不整合を強制的に修正。
 # 不整合1:draw_recとdraw_reclineどちらも1はプログラム終了
@@ -259,10 +266,13 @@ for pdf_file in pdfjpg_files:
             print("【枠と縦罫線】クリック取消は右ボタン、終了は、マウス中ボタンかEnterキーです。")
             print("【枠と縦罫線】表の数だけイメージが表示されるので上記を繰り返します。")
             print("【枠と縦罫線】書かないときは、マウス中ボタンかEnterキーで出力します。")
+            if (draw_also_hlines_on ==1):
+                print("【枠と縦罫線】draw_also_hlines_on=1のため、横罫線の描画案内を縦罫線終了後行います。")
             for extract_image in extract_PILimages:
                 # PILimage, points_array = fm_draw_rec(PILimage, draw_rec_thick, mod_flag)
                 tmpimg, points_array = fm_draw_recandlines(
-                    extract_image, draw_rec_thick, draw_line_thick, mod_flag)
+                    extract_image, draw_rec_thick, draw_line_thick,
+                    draw_hline_thick, draw_also_hlines_on, mod_flag)
 
                 out_PILimages.append(tmpimg)
     # for index end

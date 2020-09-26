@@ -225,7 +225,8 @@ def fm_draw_rec(im, i_thick, mod_flag):
 
 
 
-def fm_draw_recandlines(im, i_thick, iline_thick, mod_flag):
+def fm_draw_recandlines(im, i_thick, iline_thick,
+   ihline_thick, draw_also_hlines_on, mod_flag):
     """
     PILイメージに直接矩形(表の視覚的境界)を描画。
     【注意】draw_rect関数と違い矩形は1つのみ。(マウス左ボタンまとめてクリックの弊害)
@@ -273,11 +274,13 @@ def fm_draw_recandlines(im, i_thick, iline_thick, mod_flag):
         logger.info(str(c))
         logger.info(str(d))
         if count == 1:
-            upper_y = int(d) # line用上限X座標キープ
+            upper_y = int(d) # line用上限Y座標キープ
+            left_x = int(c) # line用左X座標キープ
             icbak = int(c) # 矩形左上キープ
             idbak = int(d)  # 矩形左上キープ
         elif count == 2: # 矩形描画
             lower_y = int(d) # line用下限X座標キープ
+            right_x = int(c) # line用右X座標キープ
             # 左上、右下を指定されたので矩形描画
             ic = int(c)
             id = int(d)
@@ -288,6 +291,24 @@ def fm_draw_recandlines(im, i_thick, iline_thick, mod_flag):
             ic = int(c) # x座標だけ必要
             cv2.line(im_list, (ic, upper_y), (ic, lower_y), (0, 0, 0),
                         thickness=iline_thick, lineType=cv2.LINE_8)
+
+    if (draw_also_hlines_on == 1):
+        print("【also 横罫線】横罫線(水平線)を引く箇所をマウス左ボタンでプロットしてください。")
+        print("【also 横罫線】最後にマウス中ボタンかEnterキーで終了してください。")
+        print("【also 横罫線】1本も書かないときも、マウス中ボタンかEnterキーで終了してください。")
+        a=plt.ginput(n=-1, mouse_add=1, mouse_pop=3, mouse_stop=2)
+        count = 0
+        cbak = 0.0
+        dbak = 0.0
+        for c, d in a:
+            count += 1
+            # print(c, d)
+            logger.info(str(c))
+            logger.info(str(d))
+            id = int(d)  # Y座標だけ必要
+            cv2.line(im_list, (left_x, id), (right_x, id),
+            (0, 0, 0), thickness=ihline_thick,
+            lineType=cv2.LINE_8)
 
         # plt.plot(c, d, "ro")  # グラフ上に座標をマークする
         # for 終わり
